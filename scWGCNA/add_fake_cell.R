@@ -1,0 +1,20 @@
+#add fake to count matrix(@assays$RNA), @meta.data and @reductions$umap ($UMAP_1,$UMAP_2)
+mat1<-seu_obj@assays$RNA@counts
+mat2<-seu_obj@assays$RNA@scale.data
+mat3<-seu_obj@assays$RNA@data
+l<-paste0(colnames(mat1),'f')
+colnames(mat1)<-l
+colnames(mat2)<-l
+colnames(mat3)<-l
+seu_obj@assays$RNA@counts<-cbind(seu_obj@assays$RNA@counts,mat1)
+seu_obj@assays$RNA@scale.data<-cbind(seu_obj@assays$RNA@scale.data,mat2)
+seu_obj@assays$RNA@data<-cbind(seu_obj@assays$RNA@data,mat3)
+df_meta<-seu_obj@meta.data
+rownames(df_meta)<-l
+seu_obj@meta.data<-rbind(seu_obj@meta.data,df_meta)
+df_umap<-jitter(seu_obj@reductions$umap@cell.embeddings)
+rownames(df_umap)<-l
+seu_obj@reductions$umap@cell.embeddings<-rbind(seu_obj@reductions$umap@cell.embeddings,df_umap)
+l_human_sample<-sapply(rownames(seu_obj@meta.data),function(x){strsplit(x,split='[.]')[[1]][1]})
+seu_obj@meta.data$human_sample<-l_human_sample
+saveRDS(seu_obj,file='seu_fake_0.rds')
